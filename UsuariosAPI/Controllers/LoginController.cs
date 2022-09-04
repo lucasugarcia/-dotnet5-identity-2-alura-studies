@@ -30,5 +30,16 @@ namespace UsuariosAPI.Controllers
 
             return Ok(resultado.Successes);
         }
+
+        [HttpPost("/Solicitar-reset")]
+        public async Task<IActionResult> SolicitarResetSenhaUsuario(SolicitarResetRequest request)
+        {
+            Result resultado = await _loginService.SolicitarRestSenhaUsuario(request);
+
+            if (resultado.IsFailed)
+                return Unauthorized(resultado.Errors);
+
+            return Ok(resultado.Successes);
+        }
     }
 }

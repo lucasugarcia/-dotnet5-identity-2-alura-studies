@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UsuariosAPI.Controllers;
 using UsuariosAPI.Data.Requests;
 
 namespace UsuariosAPI.Services
@@ -34,6 +35,21 @@ namespace UsuariosAPI.Services
             }
 
             return Result.Fail("Login falhou");
+        }
+
+        public async Task<Result> SolicitarRestSenhaUsuario(SolicitarResetRequest request)
+        {
+            var identityUser = _signInManager.UserManager.Users
+                .FirstOrDefault(u => u.NormalizedEmail == request.Email.ToUpper());
+
+            if (identityUser != null)
+            {
+                var codigoDeRecuperacao = await _signInManager.UserManager.GeneratePasswordResetTokenAsync(identityUser);
+
+                return Result.Ok().WithSuccess(codigoDeRecuperacao);
+            }
+
+            return Result.Fail("Falha ao solicitar redefinção de senha");
         }
     }
 }
