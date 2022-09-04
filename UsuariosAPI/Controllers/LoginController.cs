@@ -34,7 +34,18 @@ namespace UsuariosAPI.Controllers
         [HttpPost("/Solicitar-reset")]
         public async Task<IActionResult> SolicitarResetSenhaUsuario(SolicitarResetRequest request)
         {
-            Result resultado = await _loginService.SolicitarRestSenhaUsuario(request);
+            Result resultado = await _loginService.SolicitarResetSenhaUsuario(request);
+
+            if (resultado.IsFailed)
+                return Unauthorized(resultado.Errors);
+
+            return Ok(resultado.Successes);
+        }
+
+        [HttpPost("/Efetuar-reset")]
+        public async Task<IActionResult> ResetarSenhaUsuario(EfetuarResetRequest request)
+        {
+            Result resultado = await _loginService.SolicitarResetSenhaUsuario(request);
 
             if (resultado.IsFailed)
                 return Unauthorized(resultado.Errors);

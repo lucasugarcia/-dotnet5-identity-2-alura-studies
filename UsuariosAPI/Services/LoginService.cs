@@ -37,10 +37,9 @@ namespace UsuariosAPI.Services
             return Result.Fail("Login falhou");
         }
 
-        public async Task<Result> SolicitarRestSenhaUsuario(SolicitarResetRequest request)
+        public async Task<Result> SolicitarResetSenhaUsuario(SolicitarResetRequest request)
         {
-            var identityUser = _signInManager.UserManager.Users
-                .FirstOrDefault(u => u.NormalizedEmail == request.Email.ToUpper());
+            IdentityUser<int> identityUser = RecuperarUsuarioPorEmail(request.Email);
 
             if (identityUser != null)
             {
@@ -50,6 +49,24 @@ namespace UsuariosAPI.Services
             }
 
             return Result.Fail("Falha ao solicitar redefinção de senha");
+        }
+
+        private IdentityUser<int> RecuperarUsuarioPorEmail(string email)
+        {
+            return _signInManager.UserManager.Users
+                .FirstOrDefault(u => u.NormalizedEmail == email.ToUpper());
+        }
+
+        public async Task<Result> ResetarSenhaUsuario(EfetuarResetRequest request)
+        {
+            var identityUser = RecuperarUsuarioPorEmail(request.Email);
+
+            var resultadoIdentity = await _signInManager.UserManager.ResetPasswordAsync(identityUser, request.Token, request.Password);
+
+            if (resultadoIdentity.Succeeded)
+                return Result.Ok().WithSuccess("Senha redefinida com sucesso");
+
+            return Result.Fail("Ocorreu um erro ao resetar senha do usuário!");
         }
     }
 }
